@@ -1,0 +1,234 @@
+=== Generated schedule for mkTopModule ===
+
+Method schedule
+---------------
+Method: leds
+Ready signal: True
+Conflict-free: leds,
+	       disableSegmentsDisplay,
+	       disableDotDisplay,
+	       disableDigitDisplay,
+	       serialOut,
+	       serialIn
+Sequenced before: switches
+ 
+Method: switches
+Ready signal: True
+Conflict-free: disableSegmentsDisplay,
+	       disableDotDisplay,
+	       disableDigitDisplay,
+	       serialOut,
+	       serialIn
+Sequenced before (restricted): switches
+Sequenced after: leds
+ 
+Method: disableSegmentsDisplay
+Ready signal: True
+Conflict-free: leds,
+	       switches,
+	       disableSegmentsDisplay,
+	       disableDotDisplay,
+	       disableDigitDisplay,
+	       serialOut,
+	       serialIn
+ 
+Method: disableDotDisplay
+Ready signal: True
+Conflict-free: leds,
+	       switches,
+	       disableSegmentsDisplay,
+	       disableDotDisplay,
+	       disableDigitDisplay,
+	       serialOut,
+	       serialIn
+ 
+Method: disableDigitDisplay
+Ready signal: True
+Conflict-free: leds,
+	       switches,
+	       disableSegmentsDisplay,
+	       disableDotDisplay,
+	       disableDigitDisplay,
+	       serialOut,
+	       serialIn
+ 
+Method: serialOut
+Ready signal: True
+Conflict-free: leds,
+	       switches,
+	       disableSegmentsDisplay,
+	       disableDotDisplay,
+	       disableDigitDisplay,
+	       serialOut,
+	       serialIn
+ 
+Method: serialIn
+Ready signal: True
+Conflict-free: leds,
+	       switches,
+	       disableSegmentsDisplay,
+	       disableDotDisplay,
+	       disableDigitDisplay,
+	       serialOut
+Sequenced before (restricted): serialIn
+ 
+Rule schedule
+-------------
+Rule: clockDiv_inc
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: uartHandler_inputFIFO_portA
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: uartHandler_inputFIFO_portB
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: uartHandler_inputFIFO_portB_read_data
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: uartHandler_outputFIFO_portA
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: uartHandler_outputFIFO_portB
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: uartHandler_outputFIFO_portB_read_data
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: uartHandler_clockDiv_inc
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: uartHandler_prepareForOut
+Predicate: (! (uartHandler_inputFIFO_rRdPtr.read ==
+	       uartHandler_inputFIFO_rWrPtr.read)) &&
+	   uartHandler_inputFIFO_wDataOut.whas &&
+	   (! uartHandler_toSendBits[11]) &&
+	   (uartHandler_clockDiv_ctr == 27'd0)
+Blocking rules: (none)
+ 
+Rule: uartHandler_advanceSend
+Predicate: uartHandler_toSendBits[11] && (uartHandler_clockDiv_ctr == 27'd0)
+Blocking rules: (none)
+ 
+Rule: uartHandler_startReceiving
+Predicate: (! uartHandler_currentReceivedBit) &&
+	   (uartHandler_receivingData == 2'd0) &&
+	   (uartHandler_clockDiv_ctr == 27'd0)
+Blocking rules: (none)
+ 
+Rule: uartHandler_writeReceivedBit
+Predicate: (uartHandler_receivingData == 2'd1) &&
+	   (uartHandler_clockDiv_ctr == 27'd0)
+Blocking rules: (none)
+ 
+Rule: uartHandler_enterIntoFIFO
+Predicate: (! ((uartHandler_outputFIFO_rRdPtr.read + 11'd512) ==
+	       uartHandler_outputFIFO_rWrPtr.read)) &&
+	   (uartHandler_receivingData == 2'd2) &&
+	   (uartHandler_clockDiv_ctr == 27'd0)
+Blocking rules: (none)
+ 
+Rule: displayModule_clockDiv_inc
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: displayModule_iterateDigits
+Predicate: displayModule_readyToDisplay &&
+	   (displayModule_clockDiv_ctr == 19'd0)
+Blocking rules: (none)
+ 
+Rule: displayModule_doubleDabble
+Predicate: (displayModule_doubleDabbleCtr < 4'd14) &&
+	   (! displayModule_readyToDisplay)
+Blocking rules: (none)
+ 
+Rule: integerParser_parseBinary
+Predicate: (integerParser_currentState == 2'd1) &&
+	   (! integerParser_processedCurrentChar) &&
+	   (integerParser_currentBase == 7'd2)
+Blocking rules: integerParser_parseFinish
+ 
+Rule: integerParser_parseOctal
+Predicate: (integerParser_currentState == 2'd1) &&
+	   (! integerParser_processedCurrentChar) &&
+	   (integerParser_currentBase == 7'd8)
+Blocking rules: integerParser_parseFinish
+ 
+Rule: integerParser_parseHex
+Predicate: (integerParser_currentState == 2'd1) &&
+	   (! integerParser_processedCurrentChar) &&
+	   (integerParser_currentBase == 7'd16)
+Blocking rules: integerParser_parseFinish
+ 
+Rule: integerParser_parseDec
+Predicate: (integerParser_currentState == 2'd1) &&
+	   (! integerParser_processedCurrentChar) &&
+	   (integerParser_currentBase == 7'd10)
+Blocking rules: integerParser_parseFinish
+ 
+Rule: integerParser_parseFinish
+Predicate: (integerParser_currentState == 2'd1) &&
+	   (! integerParser_processedCurrentChar) &&
+	   ((integerParser_currentChar == 9'd13) ||
+	    (integerParser_currentChar == 9'd10))
+Blocking rules: (none)
+ 
+Rule: integerParser_parsePrefix
+Predicate: (integerParser_currentState == 2'd0) &&
+	   (! integerParser_processedCurrentChar)
+Blocking rules: (none)
+ 
+Rule: feed
+Predicate: (! (uartHandler_outputFIFO_rRdPtr.read ==
+	       uartHandler_outputFIFO_rWrPtr.read)) &&
+	   (! ((uartHandler_inputFIFO_rRdPtr.read + 11'd512) ==
+	       uartHandler_inputFIFO_rWrPtr.read)) &&
+	   integerParser_processedCurrentChar &&
+	   uartHandler_outputFIFO_wDataOut.whas
+Blocking rules: (none)
+ 
+Rule: display
+Predicate: integerParser_currentState == 2'd2
+Blocking rules: (none)
+ 
+Logical execution order: leds,
+			 switches,
+			 disableSegmentsDisplay,
+			 disableDotDisplay,
+			 disableDigitDisplay,
+			 serialOut,
+			 clockDiv_inc,
+			 uartHandler_advanceSend,
+			 uartHandler_startReceiving,
+			 uartHandler_writeReceivedBit,
+			 serialIn,
+			 uartHandler_enterIntoFIFO,
+			 uartHandler_inputFIFO_portB_read_data,
+			 uartHandler_prepareForOut,
+			 uartHandler_inputFIFO_portB,
+			 uartHandler_outputFIFO_portB_read_data,
+			 feed,
+			 uartHandler_inputFIFO_portA,
+			 uartHandler_outputFIFO_portA,
+			 uartHandler_outputFIFO_portB,
+			 uartHandler_clockDiv_inc,
+			 displayModule_iterateDigits,
+			 displayModule_doubleDabble,
+			 display,
+			 displayModule_clockDiv_inc,
+			 integerParser_parseBinary,
+			 integerParser_parseOctal,
+			 integerParser_parseHex,
+			 integerParser_parseDec,
+			 integerParser_parseFinish,
+			 integerParser_parsePrefix
+
+===========================================
