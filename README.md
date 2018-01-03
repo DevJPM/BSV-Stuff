@@ -15,3 +15,11 @@ This also contains the compiled verilog code, so everyone can run this code on t
      - It supports hex (prefix `x`,`X`,`h`,`H`), binary (prefix `b`,`B`), octal (`o`,`O`) and decimal (prefix `d`,`D` or no prefix) decoding of the data, inputs need to be followed by a carriage-return or a line-feed
      - If the integer is too big to be displayed (ie bigger than 3 decimal digits) then the display will show all-dashes
      - The conversion logic may overflow on too big inputs
+
+# How to build
+
+Simply call `make verilog` on the top level of the cloned repository, this will re-generate the `mkTopModule.v` and `mkTopModule.sched` (the rule schedule).
+
+Then feed `wrapper.v` into your Verilog compiler as the top-level module and be sure to also give it `mkTopModule.v` and the contents of the `Verilog/` subdirectory of your bluespec distribution. 
+
+You will also need to add a constraints file which maps the physical package pins (and the clock) to `wrapper`'s I/O ports. I may or may not provide this file for the Basys3 in the future, for now it is left as an exercise to the user to get the file from the internet and adapt it to work with this code.
