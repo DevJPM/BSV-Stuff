@@ -3,17 +3,20 @@ package DisplayInt7Seg;
 import GetPut::*;
 import Vector::*;
 import ClockDiv::*;
+import Basys3_Interfaces::*;
+
+typedef enum {Underscore,Dash,Off} SpecialDisplayState deriving(Eq,Bits,FShow);
 
 typedef union tagged {
     UInt#(14) UnsignedInt;
     Int#(11) SignedInt;
-} DisplayableInt deriving(Bits,Eq);
+    SpecialDisplayState AllSpecialState;
+    Vector#(4,SpecialDisplayState) IndividualSpecialStates;
+} DisplayableInt deriving(Bits,Eq,FShow);
 
 interface DisplayInterface;
     interface Put#(DisplayableInt) inputIntegerToDisplay;
-    method Bit#(7) segmentOutput;
-    method Bit#(1) dotOutput;
-    method Bit#(4) digitOutput;
+    interface DisplayOutput physical;
 endinterface
 
 module mkDisplayDigit(DisplayInterface);
@@ -21,10 +24,8 @@ module mkDisplayDigit(DisplayInterface);
     Reg#(Bool) isNegative <- mkReg(False);
     Reg#(UInt#(14)) toDisplay <- mkRegU;
     Reg#(UInt#(2)) currentDigitIndex <- mkReg(0);
-    Reg#(UInt#(4)) bcdDecodedInput[4];
+    Vector#(4,Reg#(UInt#(4))) bcdDecodedInput <- replicateM(mkReg(15));
     Reg#(UInt#(4)) doubleDabbleCtr <- mkRegU;
-    for(Integer i=0;i<4;i=i+1)
-        bcdDecodedInput[i] <- mkReg(15);
     ClockDiv#(UInt#(19)) clockDiv <- mkClockDivSimple;
 
     function Bit#(7) bcd_to_7seg(UInt#(4) in);
@@ -41,15 +42,14 @@ module mkDisplayDigit(DisplayInterface);
             8:return  7'b0000000;
             9:return  7'b0010000;
             10:return 7'b0111111; // dash = minus sign
+            11:return 7'b1110111; // underscore
             default: return 7'b1111111;
         endcase;
     endfunction
 
     rule iterateDigits (readyToDisplay && clockDiv.runNow);
         currentDigitIndex <= currentDigitIndex+1;
-        $display("BCD digit %d: %d",currentDigitIndex,bcdDecodedInput[currentDigitIndex]);
-        if(currentDigitIndex==3)
-            $finish;
+        $display("displayed digit: ",bcdDecodedInput[currentDigitIndex]);
     endrule
 
     function UInt#(4)[] lshiftBCD(UInt#(4) previousBCD[],UInt#(14) rightInt,Integer numRegs);
@@ -65,10 +65,6 @@ module mkDisplayDigit(DisplayInterface);
     endfunction
 
     rule doubleDabble (doubleDabbleCtr < 14 && !readyToDisplay);
-        $display("current i:%o",toDisplay);
-        $display("readyToDisplay?:%d",readyToDisplay);
-        for(Integer j=0;j<4;j=j+1)
-            $display("current bcd digit #%d: %d",j,bcdDecodedInput[j]);
         UInt#(4) potentiallyIncrementedCopy[4];
         if(!isNegative)
             potentiallyIncrementedCopy[3]=(bcdDecodedInput[3]>4)?bcdDecodedInput[3]+3:bcdDecodedInput[3];
@@ -79,8 +75,6 @@ module mkDisplayDigit(DisplayInterface);
 
         UInt#(4) writeBack[4] = lshiftBCD(potentiallyIncrementedCopy,toDisplay,4);
 
-        $display("right int:%d",toDisplay);
-        $display("msb:%d",msb(toDisplay));
         for(Integer j=0;j<4;j=j+1)
             bcdDecodedInput[j] <= writeBack[j];
         toDisplay <= (toDisplay<<1);
@@ -92,7 +86,6 @@ module mkDisplayDigit(DisplayInterface);
     actionvalue
         for(Integer j=0;j<4;j=j+1)
                 bcdDecodedInput[j]<=10;
-        doubleDabbleCtr<=14;
         readyToDisplay<=True;
         return True;
     endactionvalue
@@ -141,28 +134,66 @@ module mkDisplayDigit(DisplayInterface);
         endaction
     endfunction
 
-    interface Put inputIntegerToDisplay;
-    method Action put(DisplayableInt toDisplayArg);
-        //$display("input:",toDisplayArg);
+    function Action initializeFromInteger(DisplayableInt toDisplayArg);
+    action
         Bool oob <- handleOOBandInit(toDisplayArg);
         if(!oob)
             handleNegativeInts(toDisplayArg);
+    endaction
+    endfunction
+
+    function Action initializeDigit(SpecialDisplayState state, Integer index);
+    action
+        case(state)
+        Dash: bcdDecodedInput[index] <= 10;
+        Underscore: bcdDecodedInput[index] <= 11;
+        Off: bcdDecodedInput[index] <= 15;
+        endcase
+    endaction
+    endfunction
+
+    function Action initializeSpecialDigits(Vector#(4,SpecialDisplayState) specialStates);
+    action
+        for(Integer j=0;j<4;j=j+1)
+            initializeDigit(specialStates[j],j);
+        readyToDisplay <= True;
+    endaction
+    endfunction
+
+    function Action initializeAllSpecial(SpecialDisplayState specialState);
+    action
+        for(Integer j=0;j<4;j=j+1)
+            initializeDigit(specialState,j);
+        readyToDisplay <= True;
+    endaction
+    endfunction
+
+    interface Put inputIntegerToDisplay;
+    method Action put(DisplayableInt toDisplayArg);
+        case (toDisplayArg) matches
+        tagged UnsignedInt .ui: initializeFromInteger(toDisplayArg);
+        tagged SignedInt .si: initializeFromInteger(toDisplayArg);
+        tagged AllSpecialState  .as: initializeAllSpecial(as);
+        tagged IndividualSpecialStates .iss: initializeSpecialDigits(iss);
+        endcase
     endmethod
     endinterface
 
-    method Bit#(7) segmentOutput;
+    interface DisplayOutput physical;
+    method Bit#(7) disableSegmentsDisplay;
         return bcd_to_7seg(bcdDecodedInput[currentDigitIndex]);
     endmethod
 
-    method Bit#(4) digitOutput;
+    method Bit#(4) disableDigitDisplay;
         if (readyToDisplay)
             return ~(1 << currentDigitIndex);
         else
             return 1;
     endmethod
 
-    method Bit#(1) dotOutput;
+    method Bit#(1) disableDotDisplay;
         return 1;
     endmethod
+    endinterface
 endmodule
 endpackage

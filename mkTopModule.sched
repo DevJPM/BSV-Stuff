@@ -2,138 +2,190 @@
 
 Method schedule
 ---------------
-Method: leds
+Method: buttons_ifc_buttonL
 Ready signal: True
-Conflict-free: leds,
-	       disableSegmentsDisplay,
-	       disableDotDisplay,
-	       disableDigitDisplay,
-	       serialOut,
-	       serialIn
-Sequenced before: switches
+Conflict-free: buttons_ifc_buttonR,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonD,
+	       buttons_ifc_buttonC,
+	       switch_ifc_switches,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+Sequenced before (restricted): buttons_ifc_buttonL
  
-Method: switches
+Method: buttons_ifc_buttonR
 Ready signal: True
-Conflict-free: disableSegmentsDisplay,
-	       disableDotDisplay,
-	       disableDigitDisplay,
-	       serialOut,
-	       serialIn
-Sequenced before (restricted): switches
-Sequenced after: leds
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonD,
+	       buttons_ifc_buttonC,
+	       switch_ifc_switches,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+Sequenced before (restricted): buttons_ifc_buttonR
  
-Method: disableSegmentsDisplay
+Method: buttons_ifc_buttonU
 Ready signal: True
-Conflict-free: leds,
-	       switches,
-	       disableSegmentsDisplay,
-	       disableDotDisplay,
-	       disableDigitDisplay,
-	       serialOut,
-	       serialIn
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonR,
+	       buttons_ifc_buttonD,
+	       buttons_ifc_buttonC,
+	       switch_ifc_switches,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+Sequenced before (restricted): buttons_ifc_buttonU
  
-Method: disableDotDisplay
+Method: buttons_ifc_buttonD
 Ready signal: True
-Conflict-free: leds,
-	       switches,
-	       disableSegmentsDisplay,
-	       disableDotDisplay,
-	       disableDigitDisplay,
-	       serialOut,
-	       serialIn
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonR,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonC,
+	       switch_ifc_switches,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+Sequenced before (restricted): buttons_ifc_buttonD
  
-Method: disableDigitDisplay
+Method: buttons_ifc_buttonC
 Ready signal: True
-Conflict-free: leds,
-	       switches,
-	       disableSegmentsDisplay,
-	       disableDotDisplay,
-	       disableDigitDisplay,
-	       serialOut,
-	       serialIn
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonR,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonD,
+	       switch_ifc_switches,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+Sequenced before (restricted): buttons_ifc_buttonC
  
-Method: serialOut
+Method: switch_ifc_switches
 Ready signal: True
-Conflict-free: leds,
-	       switches,
-	       disableSegmentsDisplay,
-	       disableDotDisplay,
-	       disableDigitDisplay,
-	       serialOut,
-	       serialIn
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonR,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonD,
+	       buttons_ifc_buttonC,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+Sequenced before (restricted): switch_ifc_switches
+Sequenced after: led_ifc_leds
  
-Method: serialIn
+Method: led_ifc_leds
 Ready signal: True
-Conflict-free: leds,
-	       switches,
-	       disableSegmentsDisplay,
-	       disableDotDisplay,
-	       disableDigitDisplay,
-	       serialOut
-Sequenced before (restricted): serialIn
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonR,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonD,
+	       buttons_ifc_buttonC,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+Sequenced before: switch_ifc_switches
+ 
+Method: serial_ifc_serialOut
+Ready signal: True
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonR,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonD,
+	       buttons_ifc_buttonC,
+	       switch_ifc_switches,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+ 
+Method: serial_ifc_serialIn
+Ready signal: True
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonR,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonD,
+	       buttons_ifc_buttonC,
+	       switch_ifc_switches,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+ 
+Method: display_ifc_disableSegmentsDisplay
+Ready signal: True
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonR,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonD,
+	       buttons_ifc_buttonC,
+	       switch_ifc_switches,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+ 
+Method: display_ifc_disableDotDisplay
+Ready signal: True
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonR,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonD,
+	       buttons_ifc_buttonC,
+	       switch_ifc_switches,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
+ 
+Method: display_ifc_disableDigitDisplay
+Ready signal: True
+Conflict-free: buttons_ifc_buttonL,
+	       buttons_ifc_buttonR,
+	       buttons_ifc_buttonU,
+	       buttons_ifc_buttonD,
+	       buttons_ifc_buttonC,
+	       switch_ifc_switches,
+	       led_ifc_leds,
+	       serial_ifc_serialOut,
+	       serial_ifc_serialIn,
+	       display_ifc_disableSegmentsDisplay,
+	       display_ifc_disableDotDisplay,
+	       display_ifc_disableDigitDisplay
  
 Rule schedule
 -------------
 Rule: clockDiv_inc
 Predicate: True
-Blocking rules: (none)
- 
-Rule: uartHandler_inputFIFO_portA
-Predicate: True
-Blocking rules: (none)
- 
-Rule: uartHandler_inputFIFO_portB
-Predicate: True
-Blocking rules: (none)
- 
-Rule: uartHandler_inputFIFO_portB_read_data
-Predicate: True
-Blocking rules: (none)
- 
-Rule: uartHandler_outputFIFO_portA
-Predicate: True
-Blocking rules: (none)
- 
-Rule: uartHandler_outputFIFO_portB
-Predicate: True
-Blocking rules: (none)
- 
-Rule: uartHandler_outputFIFO_portB_read_data
-Predicate: True
-Blocking rules: (none)
- 
-Rule: uartHandler_clockDiv_inc
-Predicate: True
-Blocking rules: (none)
- 
-Rule: uartHandler_prepareForOut
-Predicate: (! (uartHandler_inputFIFO_rRdPtr.read ==
-	       uartHandler_inputFIFO_rWrPtr.read)) &&
-	   uartHandler_inputFIFO_wDataOut.whas &&
-	   (! uartHandler_toSendBits[11]) &&
-	   (uartHandler_clockDiv_ctr == 27'd0)
-Blocking rules: (none)
- 
-Rule: uartHandler_advanceSend
-Predicate: uartHandler_toSendBits[11] && (uartHandler_clockDiv_ctr == 27'd0)
-Blocking rules: (none)
- 
-Rule: uartHandler_startReceiving
-Predicate: (! uartHandler_currentReceivedBit) &&
-	   (uartHandler_receivingData == 2'd0) &&
-	   (uartHandler_clockDiv_ctr == 27'd0)
-Blocking rules: (none)
- 
-Rule: uartHandler_writeReceivedBit
-Predicate: (uartHandler_receivingData == 2'd1) &&
-	   (uartHandler_clockDiv_ctr == 27'd0)
-Blocking rules: (none)
- 
-Rule: uartHandler_enterIntoFIFO
-Predicate: (! ((uartHandler_outputFIFO_rRdPtr.read + 11'd512) ==
-	       uartHandler_outputFIFO_rWrPtr.read)) &&
-	   (uartHandler_receivingData == 2'd2) &&
-	   (uartHandler_clockDiv_ctr == 27'd0)
 Blocking rules: (none)
  
 Rule: displayModule_clockDiv_inc
@@ -150,85 +202,248 @@ Predicate: (displayModule_doubleDabbleCtr < 4'd14) &&
 	   (! displayModule_readyToDisplay)
 Blocking rules: (none)
  
-Rule: integerParser_parseBinary
-Predicate: (integerParser_currentState == 2'd1) &&
-	   (! integerParser_processedCurrentChar) &&
-	   (integerParser_currentBase == 7'd2)
-Blocking rules: integerParser_parseFinish
- 
-Rule: integerParser_parseOctal
-Predicate: (integerParser_currentState == 2'd1) &&
-	   (! integerParser_processedCurrentChar) &&
-	   (integerParser_currentBase == 7'd8)
-Blocking rules: integerParser_parseFinish
- 
-Rule: integerParser_parseHex
-Predicate: (integerParser_currentState == 2'd1) &&
-	   (! integerParser_processedCurrentChar) &&
-	   (integerParser_currentBase == 7'd16)
-Blocking rules: integerParser_parseFinish
- 
-Rule: integerParser_parseDec
-Predicate: (integerParser_currentState == 2'd1) &&
-	   (! integerParser_processedCurrentChar) &&
-	   (integerParser_currentBase == 7'd10)
-Blocking rules: integerParser_parseFinish
- 
-Rule: integerParser_parseFinish
-Predicate: (integerParser_currentState == 2'd1) &&
-	   (! integerParser_processedCurrentChar) &&
-	   ((integerParser_currentChar == 9'd13) ||
-	    (integerParser_currentChar == 9'd10))
+Rule: alu_powerModule_unsignedStep
+Predicate: (! alu_powerModule_result[32]) &&
+	   (! alu_powerModule_currentBase[32]) &&
+	   (! (alu_powerModule_currentExponent == 32'd0))
 Blocking rules: (none)
  
-Rule: integerParser_parsePrefix
-Predicate: (integerParser_currentState == 2'd0) &&
-	   (! integerParser_processedCurrentChar)
+Rule: alu_powerModule_signedStep
+Predicate: alu_powerModule_result[32] &&
+	   alu_powerModule_currentBase[32] &&
+	   (! (alu_powerModule_currentExponent == 32'd0))
 Blocking rules: (none)
  
-Rule: feed
-Predicate: (! (uartHandler_outputFIFO_rRdPtr.read ==
-	       uartHandler_outputFIFO_rWrPtr.read)) &&
-	   (! ((uartHandler_inputFIFO_rRdPtr.read + 11'd512) ==
-	       uartHandler_inputFIFO_rWrPtr.read)) &&
-	   integerParser_processedCurrentChar &&
-	   uartHandler_outputFIFO_wDataOut.whas
+Rule: alu_signedOperation
+Predicate: alu_leftOp[32] &&
+	   alu_rightOp[32] &&
+	   alu_op[3] &&
+	   (! (alu_op[2:0] == 3'd6)) && (! alu_isDone) &&
+	   (! (alu_op[2:0] == 3'd1))
 Blocking rules: (none)
  
-Rule: display
-Predicate: integerParser_currentState == 2'd2
+Rule: alu_unsignedOperation
+Predicate: (! alu_leftOp[32]) &&
+	   (! alu_rightOp[32]) &&
+	   alu_op[3] &&
+	   (! (alu_op[2:0] == 3'd6)) && (! alu_isDone) &&
+	   (! (alu_op[2:0] == 3'd1))
 Blocking rules: (none)
  
-Logical execution order: leds,
-			 switches,
-			 disableSegmentsDisplay,
-			 disableDotDisplay,
-			 disableDigitDisplay,
-			 serialOut,
+Rule: alu_signedOperationDiv
+Predicate: alu_leftOp[32] &&
+	   alu_rightOp[32] &&
+	   alu_op[3] && (! alu_isDone) && (alu_op[2:0] == 3'd1)
+Blocking rules: (none)
+ 
+Rule: alu_unsignedOperationDiv
+Predicate: (! alu_leftOp[32]) &&
+	   (! alu_rightOp[32]) &&
+	   alu_op[3] && (! alu_isDone) && (alu_op[2:0] == 3'd1)
+Blocking rules: (none)
+ 
+Rule: alu_startComputePower
+Predicate: alu_op[3] &&
+	   (alu_op[2:0] == 3'd6) && (! alu_isDone) && (! alu_isQueued)
+Blocking rules: (none)
+ 
+Rule: alu_fetchComputedPower
+Predicate: (alu_powerModule_currentExponent == 32'd0) &&
+	   alu_op[3] && (alu_op[2:0] == 3'd6) && alu_isQueued
+Blocking rules: (none)
+ 
+Rule: cycler_displayer_clockDiv_inc
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: cycler_displayer_iterateDigits
+Predicate: cycler_displayer_readyToDisplay &&
+	   (cycler_displayer_clockDiv_ctr == 19'd0)
+Blocking rules: (none)
+ 
+Rule: cycler_displayer_doubleDabble
+Predicate: (cycler_displayer_doubleDabbleCtr < 4'd14) &&
+	   (! cycler_displayer_readyToDisplay)
+Blocking rules: (none)
+ 
+Rule: cycler_cyclingFIFO_portA
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: cycler_cyclingFIFO_portB
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: cycler_cyclingFIFO_portB_read_data
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: cycler_clockDiv_inc
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: cycler_cycle
+Predicate: (! (cycler_cyclingFIFO_rRdPtr.read ==
+	       cycler_cyclingFIFO_rWrPtr.read)) &&
+	   (! ((cycler_cyclingFIFO_rRdPtr.read + 9'd128) ==
+	       cycler_cyclingFIFO_rWrPtr.read)) &&
+	   cycler_cyclingFIFO_wDataOut.whas &&
+	   (cycler_clockDiv_ctr == 32'd0)
+Blocking rules: (none)
+ 
+Rule: cyclerFeeder_start_reg__dreg_update
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: cyclerFeeder_state_handle_abort
+Predicate: cyclerFeeder_abort.whas && cyclerFeeder_abort.wget &&
+	   ((! cyclerFeeder_start_wire.whas) ||
+	    (! cyclerFeeder_start_wire.wget))
+Blocking rules: (none)
+ 
+Rule: cyclerFeeder_state_fired__dreg_update
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: cyclerFeeder_state_every
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: cyclerFeeder_restart
+Predicate: cyclerFeeder_start_reg_1 && (! cyclerFeeder_state_fired) &&
+	   ((! cyclerFeeder_abort.whas) || (! cyclerFeeder_abort.wget))
+Blocking rules: (none)
+ 
+Rule: cyclerFeeder_action_l52c16
+Predicate: (! ((cycler_cyclingFIFO_rRdPtr.read + 9'd128) ==
+	       cycler_cyclingFIFO_rWrPtr.read)) &&
+	   cyclerFeeder_start_wire.whas && cyclerFeeder_start_wire.wget &&
+	   ((cyclerFeeder_abort.whas && cyclerFeeder_abort.wget) ||
+	    (cyclerFeeder_state_mkFSMstate.read == 3'd0) ||
+	    (cyclerFeeder_state_mkFSMstate.read == 3'd5))
+Blocking rules: cycler_cycle
+ 
+Rule: cyclerFeeder_action_l53c16
+Predicate: (! ((cycler_cyclingFIFO_rRdPtr.read + 9'd128) ==
+	       cycler_cyclingFIFO_rWrPtr.read)) &&
+	   ((! cyclerFeeder_abort.whas) || (! cyclerFeeder_abort.wget)) &&
+	   (cyclerFeeder_state_mkFSMstate.read == 3'd1)
+Blocking rules: cycler_cycle
+ 
+Rule: cyclerFeeder_action_l54c16
+Predicate: (! ((cycler_cyclingFIFO_rRdPtr.read + 9'd128) ==
+	       cycler_cyclingFIFO_rWrPtr.read)) &&
+	   ((! cyclerFeeder_abort.whas) || (! cyclerFeeder_abort.wget)) &&
+	   (cyclerFeeder_state_mkFSMstate.read == 3'd2)
+Blocking rules: cycler_cycle
+ 
+Rule: cyclerFeeder_action_l55c16
+Predicate: (! ((cycler_cyclingFIFO_rRdPtr.read + 9'd128) ==
+	       cycler_cyclingFIFO_rWrPtr.read)) &&
+	   ((! cyclerFeeder_abort.whas) || (! cyclerFeeder_abort.wget)) &&
+	   (cyclerFeeder_state_mkFSMstate.read == 3'd3)
+Blocking rules: cycler_cycle
+ 
+Rule: cyclerFeeder_action_l56c16
+Predicate: (! ((cycler_cyclingFIFO_rRdPtr.read + 9'd128) ==
+	       cycler_cyclingFIFO_rWrPtr.read)) &&
+	   ((! cyclerFeeder_abort.whas) || (! cyclerFeeder_abort.wget)) &&
+	   (cyclerFeeder_state_mkFSMstate.read == 3'd4)
+Blocking rules: cycler_cycle
+ 
+Rule: cyclerFeeder_idle_l51c5
+Predicate: ((! cyclerFeeder_start_wire.whas) ||
+	    (! cyclerFeeder_start_wire.wget)) &&
+	   ((! cyclerFeeder_abort.whas) || (! cyclerFeeder_abort.wget)) &&
+	   (cyclerFeeder_state_mkFSMstate.read == 3'd5)
+Blocking rules: (none)
+ 
+Rule: cyclerFeeder_fsm_start
+Predicate: ((cyclerFeeder_abort.whas && cyclerFeeder_abort.wget) ||
+	    (cyclerFeeder_state_mkFSMstate.read == 3'd0) ||
+	    (cyclerFeeder_state_mkFSMstate.read == 3'd5)) &&
+	   ((! cyclerFeeder_start_reg_1) || cyclerFeeder_state_fired) &&
+	   cyclerFeeder_start_reg
+Blocking rules: (none)
+ 
+Rule: testCycler
+Predicate: ((cyclerFeeder_abort.whas && cyclerFeeder_abort.wget) ||
+	    (cyclerFeeder_state_mkFSMstate.read == 3'd0) ||
+	    (cyclerFeeder_state_mkFSMstate.read == 3'd5)) &&
+	   ((! cyclerFeeder_start_reg_1) || cyclerFeeder_state_fired) &&
+	   (! cyclerFeeder_start_reg) &&
+	   firstFSMRun
+Blocking rules: (none)
+ 
+Rule: decideOp
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: __me_check_25
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: __me_check_26
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: __me_check_27
+Predicate: True
+Blocking rules: (none)
+ 
+Rule: __me_check_28
+Predicate: True
+Blocking rules: (none)
+ 
+Logical execution order: buttons_ifc_buttonC,
+			 led_ifc_leds,
+			 switch_ifc_switches,
+			 serial_ifc_serialOut,
+			 serial_ifc_serialIn,
+			 display_ifc_disableSegmentsDisplay,
+			 display_ifc_disableDotDisplay,
+			 display_ifc_disableDigitDisplay,
+			 testCycler,
+			 decideOp,
+			 buttons_ifc_buttonL,
+			 buttons_ifc_buttonR,
+			 buttons_ifc_buttonU,
+			 buttons_ifc_buttonD,
 			 clockDiv_inc,
-			 uartHandler_advanceSend,
-			 uartHandler_startReceiving,
-			 uartHandler_writeReceivedBit,
-			 serialIn,
-			 uartHandler_enterIntoFIFO,
-			 uartHandler_inputFIFO_portB_read_data,
-			 uartHandler_prepareForOut,
-			 uartHandler_inputFIFO_portB,
-			 uartHandler_outputFIFO_portB_read_data,
-			 feed,
-			 uartHandler_inputFIFO_portA,
-			 uartHandler_outputFIFO_portA,
-			 uartHandler_outputFIFO_portB,
-			 uartHandler_clockDiv_inc,
 			 displayModule_iterateDigits,
 			 displayModule_doubleDabble,
-			 display,
 			 displayModule_clockDiv_inc,
-			 integerParser_parseBinary,
-			 integerParser_parseOctal,
-			 integerParser_parseHex,
-			 integerParser_parseDec,
-			 integerParser_parseFinish,
-			 integerParser_parsePrefix
+			 alu_signedOperation,
+			 alu_unsignedOperation,
+			 alu_signedOperationDiv,
+			 alu_unsignedOperationDiv,
+			 alu_fetchComputedPower,
+			 alu_powerModule_unsignedStep,
+			 alu_powerModule_signedStep,
+			 alu_startComputePower,
+			 cycler_displayer_iterateDigits,
+			 cycler_displayer_doubleDabble,
+			 cycler_displayer_clockDiv_inc,
+			 cycler_cyclingFIFO_portB_read_data,
+			 cycler_cycle,
+			 cycler_cyclingFIFO_portB,
+			 cycler_clockDiv_inc,
+			 cyclerFeeder_restart,
+			 cyclerFeeder_action_l53c16,
+			 cyclerFeeder_action_l54c16,
+			 cyclerFeeder_action_l55c16,
+			 cyclerFeeder_action_l56c16,
+			 __me_check_26,
+			 __me_check_27,
+			 __me_check_28,
+			 cyclerFeeder_fsm_start,
+			 cyclerFeeder_action_l52c16,
+			 __me_check_25,
+			 cycler_cyclingFIFO_portA,
+			 cyclerFeeder_idle_l51c5,
+			 cyclerFeeder_start_reg__dreg_update,
+			 cyclerFeeder_state_handle_abort,
+			 cyclerFeeder_state_every,
+			 cyclerFeeder_state_fired__dreg_update
 
 ===========================================
