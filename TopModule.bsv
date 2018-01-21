@@ -9,7 +9,6 @@ import UART::*;
 import FIFOF::*;
 import FIFO::*;
 import TextToInt :: *;
-import SimpleALU :: *;
 import Basys3_Interfaces::*;
 import DisplayCycler::*;
 import StmtFSM::*;
@@ -36,8 +35,6 @@ module mkTopModule(BasysBoardIO);
     ClockDiv#(UInt#(28)) clockDiv <- mkClockDivSimple;
     
     DisplayInterface displayModule <- mkDisplayDigit;
-    SimpleALU alu <- mkSimpleAlu;
-    CNReg#(AluOp) toCompute <- mkCNReg(Add);
     Vector#(5,Reg#(Bit#(1))) buttonStatus <- replicateM(mkReg(0)); // LRUDC
 
     CyclingDisplay cycler <- mkCyclingDisplay(128,1<<25);
@@ -78,71 +75,6 @@ module mkTopModule(BasysBoardIO);
     /*rule displayTato (clockDiv.runNow);
         displayModule.inputIntegerToDisplay.put(tagged AllSpecialState Underscore);
     endrule*/
-
-    rule decideOp;
-        if(buttonStatus[0]==1)
-            toCompute.putValue.put(Add);
-        else if(buttonStatus[1]==1)
-            toCompute.putValue.put(Sub);
-        else if(buttonStatus[2]==1)
-            toCompute.putValue.put(Mul);
-        else if(buttonStatus[3]==1)
-            toCompute.putValue.put(Div);
-        else if(buttonStatus[4]==1)
-            toCompute.putValue.put(Pow);
-    endrule
-
-    function feedVal(toCycle);
-        action
-            cycler.addEntry.put(toCycle);
-        endaction
-    endfunction
-
-    function feedCNVal(toBeRead);
-        action
-            UInt#(32) val <- toBeRead.readValue.get;
-            feedVal(tagged UnsignedInt truncate(val));
-        endaction
-    endfunction
-
-    Reg#(SignedOrUnsigned) computeBuf <- mkRegU;
-    Stmt computeAndFeed =
-    seq
-        action
-            UInt#(32) leftVal <- leftInt.readValue.get;
-            UInt#(32) rightVal <- rightInt.readValue.get;
-            AluOp toBeComputed <- toCompute.readValue.get;
-            alu.setupCalculation(toBeComputed,tagged Unsigned leftVal,tagged Unsigned rightVal);
-        endaction
-        action
-            cycler.resetCycle;
-        endaction
-        feedVal(tagged AllSpecialState Off);
-        feedCNVal(leftInt);
-        feedCNVal(rightInt);
-        action
-            SignedOrUnsigned computeResult <- alu.getResult;
-            computeBuf <= computeResult;
-        endaction
-        action
-            if(computeBuf matches tagged Unsigned .cR)
-                if(cR > 9999)
-                    feedVal(tagged AllSpecialState Dash);
-                else
-                    feedVal(tagged UnsignedInt truncate(cR));
-            else if(computeBuf matches tagged Signed .cR)
-                if(abs(cR) > 999)
-                    feedVal(tagged AllSpecialState Dash);
-                else
-                    feedVal(tagged SignedInt truncate(cR));
-        endaction
-    endseq;
-    FSM cyclerFeeder <- mkFSM(computeAndFeed);
-
-    rule computeAndDisplay(toCompute.hasChanged || leftInt.hasChanged || rightInt.hasChanged);
-        cyclerFeeder.start;     
-        //displayModule.inputIntegerToDisplay.put(tagged UnsignedInt 128);
-    endrule
 
     Reg#(Bit#(16)) ledStatus <- mkReg(0);
     interface SwitchInputs switch_ifc;
