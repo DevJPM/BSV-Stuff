@@ -1,5 +1,7 @@
 package TopModule;
 
+typedef enum {LEFT = 0, RIGHT = 1, UP = 2, DOWN = 3, CENTER = 4} ButtonVectorIndex deriving(Eq,Bits,Bounded);
+
 import GetPut::*;
 import DisplayInt7Seg :: *;
 import ClockDiv::*;
@@ -7,15 +9,18 @@ import UART::*;
 import FIFOF::*;
 import FIFO::*;
 import TextToInt :: *;
+import Basys3_Interfaces::*;
+import DisplayCycler::*;
+import StmtFSM::*;
+import Vector::*;
+import CNReg::*;
 
 interface BasysBoardIO;
-    method Bit#(16) leds;
-    method Action switches(Bit#(16) switch_status);
-    method Bit#(7) disableSegmentsDisplay;
-    method Bit#(1) disableDotDisplay;
-    method Bit#(4) disableDigitDisplay;
-    method Bit#(1) serialOut;
-    method Action serialIn(Bit#(1) serial_input);
+    interface ButtonInputs buttons_ifc;
+    interface SwitchInputs switch_ifc;
+    interface LEDOutputs led_ifc;
+    interface SerialIO serial_ifc;
+    interface DisplayOutput display_ifc;
 endinterface
 
 (*synthesize,always_ready,always_enabled*)
@@ -25,16 +30,40 @@ module mkTopModule(BasysBoardIO);
     Reg#(UInt#(4)) currentNumberU <- mkReg(0);
     Reg#(Int#(11)) currentNumberS <- mkReg(0);
     Reg#(Bool) currentIsSigned <- mkReg(False);
-    Reg#(UInt#(18)) leftInt <- mkReg(0);
-    Reg#(UInt#(18)) rightInt <- mkReg(0);
-    ClockDiv#(UInt#(27)) clockDiv <- mkClockDivSimple;
-
-    Reg#(Bit#(1)) buffer <- mkRegU;
-    Reg#(Byte) uartBuf <- mkReg(0);
-
-    UART uartHandler <- mkUARTController(9600,False);
+    CNReg#(UInt#(32)) leftInt <- mkCNReg(0);
+    CNReg#(UInt#(32)) rightInt <- mkCNReg(0);
+    ClockDiv#(UInt#(28)) clockDiv <- mkClockDivSimple;
+    
     DisplayInterface displayModule <- mkDisplayDigit;
-    TextToInt#(Int#(15)) integerParser <- mkTextToInt(True);
+    Vector#(5,Reg#(Bit#(1))) buttonStatus <- replicateM(mkReg(0)); // LRUDC
+
+    CyclingDisplay cycler <- mkCyclingDisplay(128,1<<25);
+
+    // use this code-block to test the cycler in isolation
+    /*function feedVal(toCycle);
+        action
+            cycler.addEntry.put(toCycle);
+        endaction
+    endfunction
+    Stmt demoFeeder =
+    seq
+        action
+        cycler.resetCycle;
+        endaction
+        feedVal(tagged SignedInt -127);
+        feedVal(tagged UnsignedInt 1337);
+        feedVal(tagged AllSpecialState Underscore);
+        feedVal(tagged IndividualSpecialStates replicate(Off));
+        feedVal(tagged AllSpecialState Dash);
+    endseq;
+    FSM cyclerFeeder <- mkFSM(demoFeeder);
+    Reg#(Bool) firstFSMRun <- mkReg(True);
+    ClockDiv#(UInt#(128)) requeueCLockDiv <- mkClockDivSimple; // essentially infinite
+
+    rule testCycler (requeueCLockDiv.runNow);
+        cyclerFeeder.start;
+    endrule*/
+
 
     // the following rule display characters received via UART to the 7 segment display
     /*rule fetch;
@@ -43,57 +72,81 @@ module mkTopModule(BasysBoardIO);
         displayModule.inputIntegerToDisplay.put(tagged UnsignedInt zeroExtend(unpack(result)));
     endrule*/
 
-    rule feed;
-        Byte result <- uartHandler.recvbuf.get;
-        uartBuf <= result;
-        integerParser.feedCharacter.put(result);
-        uartHandler.sendbuf.put(result);
-    endrule
-
-    rule display;
-        Int#(15) parseResult <- integerParser.getInteger.get;
-        displayModule.inputIntegerToDisplay.put(tagged SignedInt truncate(unpack(pack(parseResult))));
-    endrule
+    /*rule displayTato (clockDiv.runNow);
+        displayModule.inputIntegerToDisplay.put(tagged AllSpecialState Underscore);
+    endrule*/
 
     Reg#(Bit#(16)) ledStatus <- mkReg(0);
+    interface SwitchInputs switch_ifc;
     method Action switches(Bit#(16) switch_status); 
         ledStatus<= switch_status;
-        leftInt <= zeroExtend(unpack(switch_status[15:8]));
-        rightInt <= zeroExtend(unpack(switch_status[7:0]));
+        leftInt.putValue.put(zeroExtend(unpack(switch_status[15:8])));
+        rightInt.putValue.put(zeroExtend(unpack(switch_status[7:0])));
     endmethod
+    endinterface
 
+    interface LEDOutputs led_ifc;
     method Bit#(16) leds;
         // output the ascii code of the last received character (from UART) on the left 8 leds
-        return {uartBuf,ledStatus[7:0]};//ledStatus;
+        return ledStatus;
     endmethod
+    endinterface
 
-    method Bit#(1) disableDotDisplay;
-        return displayModule.dotOutput;
-    endmethod
+    interface display_ifc = cycler.physical;
 
-    method Bit#(4) disableDigitDisplay;
-        return displayModule.digitOutput;
-    endmethod
-
-    method Bit#(7) disableSegmentsDisplay;
-        return displayModule.segmentOutput;
-    endmethod
-
+    interface SerialIO serial_ifc;
     method Bit#(1) serialOut;
-        return uartHandler.serialOut;
+        return 1;
+    endmethod
+    
+    method Action serialIn(Bit#(1) serial_input);
+        //uartHandler.serialIn(serial_input);
+    endmethod
+    endinterface
+
+    interface ButtonInputs buttons_ifc;
+    method Action buttonL(Bit#(1) left_input);
+        buttonStatus[0] <= left_input;
     endmethod
 
-    method Action serialIn(Bit#(1) serial_input);
-        uartHandler.serialIn(serial_input);
+    method Action buttonR(Bit#(1) right_input);
+        buttonStatus[1] <= right_input;
     endmethod
+
+    method Action buttonU(Bit#(1) upper_input);
+        buttonStatus[2] <= upper_input;
+    endmethod
+
+    method Action buttonD(Bit#(1) down_input);
+        buttonStatus[3] <= down_input;
+    endmethod
+
+    method Action buttonC(Bit#(1) center_input);
+        buttonStatus[4] <= center_input;
+    endmethod
+    endinterface
 endmodule
 
 module mkTb(Empty);
 BasysBoardIO dut <- mkTopModule;
+ClockDiv#(UInt#(30)) clockDiv <- mkClockDivSimple;
+Reg#(Bool) firstTime <- mkReg(True);
 
 rule lightEmUp;
-    dut.switches(0);
-    dut.serialIn(1);
+    dut.switch_ifc.switches(0);
+    dut.serial_ifc.serialIn(1);
+    dut.buttons_ifc.buttonC(0);
+    dut.buttons_ifc.buttonD(0);
+    dut.buttons_ifc.buttonU(0);
+    dut.buttons_ifc.buttonL(0);
+    dut.buttons_ifc.buttonR(0);
+endrule
+
+rule counter (clockDiv.runNow);
+    if(firstTime)
+        firstTime <= False;
+    else
+        $finish;
 endrule
 endmodule
 
