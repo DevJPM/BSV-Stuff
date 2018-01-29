@@ -5,6 +5,7 @@ import GetPut::*;
 import ClockDiv::*;
 import BRAMFIFO::*;
 import Clocks::*;
+import Basys3_Interfaces::*;
 
 typedef Bit#(8) Byte;
 typedef enum{WAITING_FOR_BYTE, RECEIVING_BITS, ENQUEUEING_BYTE} ReceivementState deriving(Bits,Eq);
@@ -12,8 +13,7 @@ typedef enum{WAITING_FOR_BYTE, RECEIVING_BITS, ENQUEUEING_BYTE} ReceivementState
 interface UART;
     interface Put#(Byte) sendbuf;
     interface Get#(Byte) recvbuf;
-    method Action serialIn(Bit#(1) incomingSignal);
-    method Bit#(1) serialOut;
+    interface SerialIO physical;
 endinterface
 
 module mkUARTController#(UInt#(27) baudRate,Bool enableParity)(UART);
@@ -72,6 +72,7 @@ module mkUARTController#(UInt#(27) baudRate,Bool enableParity)(UART);
     interface sendbuf = toPut(inputFIFO);
     interface recvbuf = toGet(outputFIFO);
 
+    interface SerialIO physical;
     method Action serialIn(Bit#(1) incomingSignal);
         currentReceivedBit <= incomingSignal;
     endmethod
@@ -82,6 +83,7 @@ module mkUARTController#(UInt#(27) baudRate,Bool enableParity)(UART);
         else
             return 1;
     endmethod
+    endinterface
 
 endmodule
 

@@ -14,6 +14,9 @@ import DisplayCycler::*;
 import StmtFSM::*;
 import Vector::*;
 import CNReg::*;
+import BlueCheckToBasysUARTBridge ::*;
+import BlueCheck::*;
+import Clocks::*;
 
 interface BasysBoardIO;
     interface ButtonInputs buttons_ifc;
@@ -22,6 +25,20 @@ interface BasysBoardIO;
     interface SerialIO serial_ifc;
     interface DisplayOutput display_ifc;
 endinterface
+
+module [BlueCheck] mkArithSpec ();
+    function Bool addComm(Int#(4) x, Int#(4) y) =
+      x + y == y + x;
+  
+    function Bool addAssoc(Int#(4) x, Int#(4) y, Int#(4) z) =
+      x + (y + z) == (x + y) + z;
+  
+    function Bool subComm(Int#(4) x, Int#(4) y) =
+      x - y == y - x;
+  
+    prop("addComm"  , addComm);
+    prop("addAssoc" , addAssoc);
+endmodule
 
 (*synthesize,always_ready,always_enabled*)
 module mkTopModule(BasysBoardIO);
@@ -38,6 +55,12 @@ module mkTopModule(BasysBoardIO);
     Vector#(5,Reg#(Bit#(1))) buttonStatus <- replicateM(mkReg(0)); // LRUDC
 
     CyclingDisplay cycler <- mkCyclingDisplay(128,1<<25);
+
+    Clock clk <- exposeCurrentClock;
+    MakeResetIfc r <- mkReset(0, True, clk);
+
+    JtagUart tester <- blueCheckIDSynth(mkArithSpec,r);
+    SerialIO bridge <- mkBC2BUB(tester,9600,False);
 
     // use this code-block to test the cycler in isolation
     /*function feedVal(toCycle);
@@ -94,15 +117,17 @@ module mkTopModule(BasysBoardIO);
 
     interface display_ifc = cycler.physical;
 
-    interface SerialIO serial_ifc;
-    method Bit#(1) serialOut;
+
+    
+    interface SerialIO serial_ifc = bridge;
+    /*method Bit#(1) serialOut;
         return 1;
     endmethod
     
     method Action serialIn(Bit#(1) serial_input);
         //uartHandler.serialIn(serial_input);
     endmethod
-    endinterface
+    endinterface*/
 
     interface ButtonInputs buttons_ifc;
     method Action buttonL(Bit#(1) left_input);
